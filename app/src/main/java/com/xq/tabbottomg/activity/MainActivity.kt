@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
 //            "#ff656667",
 //            "#ffd44949"
 //        )
+
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.luoxi, null)
 
         /*val infoCategory = TabBottomInfo<String>(

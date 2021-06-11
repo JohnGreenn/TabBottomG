@@ -9,13 +9,17 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.xq.tabbottomg.R;
 import com.xq.tabbottomg.utils.DisplayUtil;
+import com.xq.tabbottomg.utils.ViewUtil;
 import com.xq.tabbottomg.view.tab.common.ITabLayout;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +45,8 @@ public class TabBottomLayoutG extends FrameLayout implements ITabLayout<TabBotto
     //TabBottom的头部线条颜色
     private String bottomLineColor = "#dfe0e1";
     private List<TabBottomInfo<?>> infoList;
+    //底部背景色
+    private int bottomBgColor = Color.WHITE;
 
     private static final String TAG_TAB_BOTTOM = "TAG_TAB_BOTTOM";
 
@@ -103,6 +109,8 @@ public class TabBottomLayoutG extends FrameLayout implements ITabLayout<TabBotto
         addBottomLine();
         addView(ll, flPrams);
 
+        fixContentView();
+
     }
 
     @Override
@@ -112,6 +120,10 @@ public class TabBottomLayoutG extends FrameLayout implements ITabLayout<TabBotto
 
     public void setTabAlpha(float alpha) {
         this.bottomAlpha = alpha;
+    }
+
+    public void setBottomBgColor(int color) {
+        this.bottomBgColor = color;
     }
 
     public void setTabHeight(float tabHeight) {
@@ -173,7 +185,31 @@ public class TabBottomLayoutG extends FrameLayout implements ITabLayout<TabBotto
         params.gravity = Gravity.BOTTOM;
         addView(view, params);
         view.setAlpha(bottomAlpha);
-        //view.setBackgroundColor(Color.BLUE);
+        view.setBackgroundColor(bottomBgColor);
+
+    }
+
+    /**
+     * 修复内容区域的底部Padding
+     */
+    private void fixContentView() {
+        if (!(getChildAt(0) instanceof ViewGroup)) {
+            return;
+        }
+        ViewGroup rootView = (ViewGroup) getChildAt(0);
+        ViewGroup targetView = ViewUtil.findTypeView(rootView, RecyclerView.class);
+        if (targetView == null) {
+            //查找srcollview
+            targetView = ViewUtil.findTypeView(rootView, ScrollView.class);
+        }
+        if (targetView == null) {
+            //查找AbsListView（是gridview和listview子类）
+            targetView = ViewUtil.findTypeView(rootView, AbsListView.class);
+        }
+        if (targetView != null) {
+            targetView.setPadding(0, 0, 0, DisplayUtil.dp2px(tabBottomHeight, getResources()));
+            targetView.setClipToPadding(false);
+        }
     }
 
 }
